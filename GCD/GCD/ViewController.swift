@@ -12,10 +12,52 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var myTableView: UITableView!
     
+    let client = APIClient()
+    var info = ["吃飯", "睡覺", "打東東"]
+    var name: String?
+    var address: String?
+    var head: String?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setcell()
+        
+        client.getName { (name, error) in
+
+            if let error = error {
+                print(error)
+            } else {
+                guard let name = name else { return }
+                self.info[0] = name
+                self.myTableView.reloadData()
+
+            }
+        }
+        
+        client.getAddress { (address, error) in
+            
+            if let error = error {
+                print(error)
+            } else {
+                guard let address = address else { return }
+                self.info[1] = address
+                self.myTableView.reloadData()
+
+            }
+        }
+        
+        client.getHead { (head, error) in
+
+            if let error = error {
+                print(error)
+            } else {
+                guard let head = head else { return }
+                self.info[2] = head
+                self.myTableView.reloadData()
+
+            }
+        }
         
     }
 
@@ -49,11 +91,14 @@ extension ViewController: UITableViewDataSource {
             withIdentifier: "cell",
             for: indexPath) as? MyTableViewCell {
             
+            //let cellIndexPath = info[indexPath.row]
+            
+            cell.infoLabel.text = info[indexPath.row]
+            
             return cell
         }
         return UITableViewCell()
     }
-    
     
 }
 
