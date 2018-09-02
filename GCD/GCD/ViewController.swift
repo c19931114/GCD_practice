@@ -14,51 +14,15 @@ class ViewController: UIViewController {
     
     let client = APIClient()
     var info = ["吃飯", "睡覺", "打東東"]
-    var name: String?
-    var address: String?
-    var head: String?
+    
+    let dispatchGroup = DispatchGroup()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setcell()
-        
-        client.getName { (name, error) in
-
-            if let error = error {
-                print(error)
-            } else {
-                guard let name = name else { return }
-                self.info[0] = name
-                self.myTableView.reloadData()
-
-            }
-        }
-        
-        client.getAddress { (address, error) in
-            
-            if let error = error {
-                print(error)
-            } else {
-                guard let address = address else { return }
-                self.info[1] = address
-                self.myTableView.reloadData()
-
-            }
-        }
-        
-        client.getHead { (head, error) in
-
-            if let error = error {
-                print(error)
-            } else {
-                guard let head = head else { return }
-                self.info[2] = head
-                self.myTableView.reloadData()
-
-            }
-        }
-        
+        groupPrint()
+       
     }
 
     override func didReceiveMemoryWarning() {
@@ -70,7 +34,61 @@ class ViewController: UIViewController {
         let cellNib = UINib(nibName: "MyTableViewCell", bundle: nil)
         myTableView.register(cellNib, forCellReuseIdentifier: "cell")
     }
-
+    
+    func groupPrint() {
+        
+        dispatchGroup.enter()
+        client.getName { (name, error) in
+            
+            if let error = error {
+                
+                print(error)
+                self.dispatchGroup.leave()
+            } else {
+                
+                guard let name = name else { return }
+                self.info[0] = name
+                self.dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.enter()
+        client.getAddress { (address, error) in
+            
+            if let error = error {
+                
+                print(error)
+                self.dispatchGroup.leave()
+            } else {
+                
+                guard let address = address else { return }
+                self.info[1] = address
+                self.dispatchGroup.leave()
+                
+            }
+        }
+        
+        dispatchGroup.enter()
+        client.getHead { (head, error) in
+            
+            if let error = error {
+                
+                print(error)
+                self.dispatchGroup.leave()
+            } else {
+                
+                guard let head = head else { return }
+                self.info[2] = head
+                self.dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            
+            print("All functions complete 👍")
+            self.myTableView.reloadData()
+        }
+    }
 }
 
 extension ViewController: UITableViewDataSource {
