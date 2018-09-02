@@ -86,7 +86,7 @@ class ViewController: UIViewController {
         dispatchGroup.notify(queue: .main) {
             
             print("All functions complete 👍")
-            self.myTableView.reloadData()
+            self.myTableView.reloadData() //一切都結束後再更新
         }
     }
 }
@@ -117,10 +117,6 @@ extension ViewController: UITableViewDataSource {
         }
         return UITableViewCell()
     }
-    
-}
-
-extension ViewController {
     
 }
 
